@@ -1,7 +1,7 @@
-// prisma/seed.ts
-import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import { prisma } from "./config/database";
+
+const prisma = new PrismaClient();
 
 async function main() {
   const email = "demo@drivenpass.com";

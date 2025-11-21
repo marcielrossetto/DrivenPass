@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "npm run migration:run && npm run seed && node dist/server.js",
     "prisma:dev": "prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",
-    "seed": "ts-node-dev --esm prisma/seed.ts"
+    "seed": "prisma db seed",
+    "migration:run": "prisma migrate deploy"
+  },
+  "prisma": {
+    "seed": "ts-node-dev prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
