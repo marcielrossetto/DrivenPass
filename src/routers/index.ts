@@ -5,7 +5,7 @@ import credentialsRouter from "./credentialsRouter";
 
 const router = Router();
 
-router.get("/health", (_req, res) => res.send("OK!"));
+router.get("/health", (_req, res) => res.send("I'm OK!"));
 router.use(authRouter);
 router.use(credentialsRouter);
 
