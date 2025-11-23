@@ -1,67 +1,67 @@
-// src/services/credentialsService.ts
 import { credentialsRepository } from "../repositories/credentialsRepository";
 import { encrypt, decrypt } from "../utils/cryptrUtils";
 import { conflictError, notFoundError, unauthorizedError } from "../utils/errors";
 
-type CreateCredentialParams = {
+interface CreateCredentialParams {
   title: string;
   url: string;
   username: string;
   password: string;
-};
+}
 
 async function createCredential(userId: number, params: CreateCredentialParams) {
-  const existing = await credentialsRepository.findByTitleAndUserId(
-    params.title,
-    userId
-  );
-  if (existing) throw conflictError("Você já tem uma credencial com esse título");
+  const existing = await credentialsRepository.findByTitleAndUserId(params.title, userId);
+  if (existing) throw conflictError("Já existe uma credencial com esse título para este usuário");
 
   const encryptedPassword = encrypt(params.password);
 
   await credentialsRepository.create({
     ...params,
     password: encryptedPassword,
-    userId,
+    userId
   });
 }
 
-async function getCredentials(userId: number) {
-  const credentials = await credentialsRepository.findAllByUserId(userId);
+async function findAll(userId: number) {
+  const credentials = await credentialsRepository.findAll(userId);
 
-  return credentials.map((c) => ({
-    ...c,
-    password: decrypt(c.password),
+  return credentials.map(cred => ({
+    ...cred,
+    password: decrypt(cred.password)
   }));
 }
 
-async function getCredentialById(userId: number, credentialId: number) {
-  const credential = await credentialsRepository.findById(credentialId);
+async function findById(userId: number, id: number) {
+  const credential = await credentialsRepository.findById(id);
   if (!credential) throw notFoundError("Credencial não encontrada");
-  if (credential.userId !== userId) throw unauthorizedError();
+
+  if (credential.userId !== userId)
+    throw unauthorizedError("Credencial não pertence ao usuário");
 
   return {
     ...credential,
-    password: decrypt(credential.password),
+    password: decrypt(credential.password)
   };
 }
 
-async function deleteCredential(userId: number, credentialId: number) {
-  const credential = await credentialsRepository.findById(credentialId);
+async function deleteById(userId: number, id: number) {
+  const credential = await credentialsRepository.findById(id);
   if (!credential) throw notFoundError("Credencial não encontrada");
-  if (credential.userId !== userId) throw unauthorizedError();
 
-  await credentialsRepository.deleteById(credentialId);
+  if (credential.userId !== userId)
+    throw unauthorizedError("Credencial não pertence ao usuário");
+
+  await credentialsRepository.deleteById(id);
 }
 
-async function eraseAll(userId: number) {
+async function deleteAllByUserId(userId: number) {
   await credentialsRepository.deleteAllByUserId(userId);
 }
 
 export const credentialsService = {
   createCredential,
-  getCredentials,
-  getCredentialById,
-  deleteCredential,
-  eraseAll,
+  findAll,
+  findById,
+  deleteById,
+  deleteAllByUserId
 };

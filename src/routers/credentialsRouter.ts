@@ -1,12 +1,13 @@
-// src/routers/credentialsRouter.ts
 import { Router } from "express";
 import {
   createCredential,
   deleteCredential,
   eraseAll,
   getCredentialById,
-  getCredentials,
+  getCredentials
 } from "../controllers/credentialsController";
+
+
 import { tokenValidatorMiddleware } from "../middlewares/tokenValidatorMiddleware";
 import { schemaValidatorMiddleware } from "../middlewares/schemaValidatorMiddleware";
 import { credentialSchema } from "../schemas/credentialSchema";
